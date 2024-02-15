@@ -20,7 +20,7 @@
     
     "paths": {
       "@modules/*": ["./src/modules/*"],
-      "@database/*": ["./src/database/*"],
+      "@models/*": ["src/models/*"],
     }
   },
 }

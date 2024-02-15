@@ -2,6 +2,8 @@ import { ConfigModule } from '@modules/config'
 import { ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { User } from '@models/user'
+
 // Rather than wrapping a module in shallow @Module (making "PointFree Module")
 // Let's export the config directly
 export const DatabaseModule = TypeOrmModule.forRootAsync({
@@ -18,7 +20,9 @@ export const DatabaseModule = TypeOrmModule.forRootAsync({
         type: 'mongodb',
         host: configService.get('DB_HOST') || 'localhost',
         port: Number.parseInt(configService.get('DB_PORT')) || 27017,
-        entities: [],
+        entities: [
+          User
+        ],
         synchronize: false,
       }
     }

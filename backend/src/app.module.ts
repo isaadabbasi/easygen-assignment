@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 
 import { LoggerModule } from '@modules/logger';
 import { ConfigModule } from '@modules/config'
-import { DatabaseModule } from '@database/index'
+import { DatabaseModule } from '@modules/database'
 
 @Module({
   imports: [
