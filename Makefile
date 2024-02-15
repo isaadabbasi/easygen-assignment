@@ -3,7 +3,7 @@ FRONTEND_DIR := frontend
 BACKEND_DIR := backend
 
 # Phony targets
-.PHONY: build up up-frontend up-backend down
+.PHONY: build up-frontend up-backend down
 
 # Default target
 build: frontend-build backend-build
@@ -16,13 +16,12 @@ backend-build:
 	cd $(BACKEND_DIR) && npm install && npm run clean && npm run build
 
 # Up targets
-up:
-	docker-compose up -d
 
-up-frontend: up
+up-frontend:
 	cd $(FRONTEND_DIR) && echo "y" | npx serve -s build
 
-up-backend: up
+up-backend:
+	docker-compose up -d;
 	cd $(BACKEND_DIR) && npm run start:prod
 
 # Down target
