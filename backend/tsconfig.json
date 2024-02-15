@@ -19,7 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     
     "paths": {
-      "@modules": ["src/modules"],
+      "@modules/*": ["./src/modules/*"],
     }
   },
 }
