@@ -1,13 +1,14 @@
 import { CookieOptions } from 'express'
-import { User } from '@models/user'
 import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { JwtService, JwtSignOptions } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
 import { NODE_ENVS } from '@utils/constants'
 
 @Injectable()
 export class AuthService {
 
+  private readonly accessTokenJwtOptions: JwtSignOptions = null
+  private readonly refreshTokenJwtOptions: JwtSignOptions = null
   private readonly cookieOptions: CookieOptions
 
   constructor(
@@ -20,14 +21,8 @@ export class AuthService {
       sameSite: true,
       secure: isProd,
     }
-  }
 
-  signAccessToken(user: User): Promise<string> {
-    const { _id: subject, ..._user } = user
-    return this.jwtService.signAsync({
-      subject,
-      ..._user,
-    }, {
+    this.accessTokenJwtOptions =  {
       // IMPORTANT NOTES - 
       algorithm: 'HS256', // Symmetric key encryption algorithm
       // Its fine to use symmetric key encryption for short lived sessions, 
@@ -37,12 +32,9 @@ export class AuthService {
       expiresIn: this.configService.getOrThrow('JWT_EXPIRESIN'),
       audience: this.configService.get('JWT_AUDIENCE') || '*',
       subject: 'authentication',
-    })
-  }
+    }
 
-  signRefreshToken(user: User): Promise<string> {
-    const { _id, email } = user
-    return this.jwtService.signAsync({ _id, email }, {
+    this.refreshTokenJwtOptions = {
       // IMPORTANT NOTES - 
       algorithm: 'HS256', // Symmetric key encryption algorithm
       // We should be using a asymetric-key encryption 'RS256' | 'RS512' but for that -
@@ -52,19 +44,27 @@ export class AuthService {
       // algorithm: 'RS256' | 'RS512'
       secret: this.configService.getOrThrow('REFRESH_TOKEN_SECRET'),
       expiresIn: this.configService.getOrThrow('REFRESH_TOKEN_EXPIRESIN'),
-    })
+    }
   }
 
-  getTokenSecret(): string {
-    return this.configService.get('JWT_SECRET')
+  signToken(user, tokenType: 'access' | 'refresh'): Promise<string> {
+    const { _id, email } = user
+    const options = tokenType === 'access' ?
+      this.accessTokenJwtOptions :
+      this.refreshTokenJwtOptions
+    return this.jwtService.signAsync({ _id, email }, options)
   }
 
-  getTokenTTL(): string {
-    return this.configService.get('JWT_EXPIRESIN')
+  verifyToken<T extends Object>(token: string, tokenType: 'access' | 'refresh'): Promise<T> {
+    const { secret } = tokenType === 'access' ?
+      this.accessTokenJwtOptions :
+      this.refreshTokenJwtOptions
+    return this.jwtService.verifyAsync<T>(token, { secret })
   }
 
-  getRefreshTokenTTL(): string {
-    return this.configService.get('REFRESH_TOKEN_EXPIRESIN')
+  // Use of Generics: .decode is generic
+  decodeJwt<T>(token: string): T { 
+    return this.jwtService.decode<T>(token);
   }
 
   getCookieOptions(): CookieOptions {

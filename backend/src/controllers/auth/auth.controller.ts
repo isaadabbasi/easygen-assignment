@@ -1,5 +1,5 @@
-import { Response } from 'express'
-import { Body, Controller, HttpCode, HttpStatus, Post, Res, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Request, Response } from 'express'
+import { Body, Controller, HttpCode, HttpStatus, Post, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { SignInDTO, SignUpDTO } from '@dto/auth'
 import { UserRepository } from '@repositories/user'
 import { Exceptions } from '@utils/exceptions'
@@ -7,7 +7,8 @@ import { CryptService } from '@services/crypt'
 import { AuthService } from '@services/auth/auth.service'
 import { Logger } from '@nestjs/common'
 import { User } from '@models/user'
-import { TOKENS } from '@utils/constants'
+import { ACTIVE_SESSION_KEY, TOKENS } from '@utils/constants'
+import { AuthGuard } from '@services/auth-guard'
 
 @Controller('api')
 export class AuthController {
@@ -22,7 +23,7 @@ export class AuthController {
   @Post('sign-in')
   @HttpCode(HttpStatus.OK)
   @UsePipes(ValidationPipe)
-  async signIn(@Body() payload: SignInDTO, @Res() response: Response): Promise<any> {
+  async signIn(@Body() payload: SignInDTO, @Res() response: Response): Promise<void> {
     this.logger.log('[AuthController:SignIn] attempt to signin', payload)
 
     const user = await this.userRepository.findByEmail(payload.email)
@@ -46,7 +47,7 @@ export class AuthController {
   @Post('sign-up')
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(ValidationPipe)
-  async signUp(@Body() payload: SignUpDTO, @Res() response: Response): Promise<any> {
+  async signUp(@Body() payload: SignUpDTO, @Res() response: Response): Promise<void> {
     this.logger.log('[AuthController:SignUp] attempt to signup', payload)
     
     const user = await this.userRepository.findByEmail(payload.email)
@@ -67,12 +68,25 @@ export class AuthController {
     response.send('Created')
   }
 
+  @Post('sign-out')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  async signOut(request: Request, response: Response): Promise<void> {
+    const { _id } = request[ACTIVE_SESSION_KEY]
+    if (_id) {
+      await this.userRepository.update(_id, { refreshToken: null })
+    }
+    response.clearCookie(TOKENS.TOKEN)
+    response.clearCookie(TOKENS.REFRESH_TOKEN)
+    response.send('Ok')
+  }
+
   private async updateSessionTokens(user: User, response: Response): Promise<void> {
     let token = null
     let refreshToken = null
     try {
-      token = await this.authService.signAccessToken(user)
-      refreshToken = await this.authService.signRefreshToken(user)
+      token = await this.authService.signToken(user, 'access')
+      refreshToken = await this.authService.signToken(user, 'refresh')
     } catch(e) {
       // Extremely Rare chances that it will happen
       this.logger.log('[AuthController] sign token failed')

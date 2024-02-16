@@ -9,3 +9,5 @@ export const TOKENS = {
   TOKEN: 'TOKEN',
   REFRESH_TOKEN: 'REFRESH_TOKEN'
 }
+
+export const ACTIVE_SESSION_KEY = 'active-session-user'
