@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { User } from '@models/user'
+import { MongoConnectionOptions } from 'typeorm/driver/mongodb/MongoConnectionOptions'
 
 // Rather than wrapping a module in shallow @Module (making "PointFree Module")
 // Let's export the config directly
@@ -20,11 +21,12 @@ export const DatabaseModule = TypeOrmModule.forRootAsync({
         type: 'mongodb',
         host: configService.get('DB_HOST') || 'localhost',
         port: Number.parseInt(configService.get('DB_PORT')) || 27017,
+        appname: configService.get('DB_APP') || 'app',
         entities: [
           User
         ],
         synchronize: false,
-      }
+      } as MongoConnectionOptions
     }
   }
 })
