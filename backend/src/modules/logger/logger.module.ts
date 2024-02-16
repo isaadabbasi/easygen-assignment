@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { NODE_ENVS } from '@utils/constants'
 
 import { LoggerModule as PinoLoggerModule } from 'nestjs-pino'
 
@@ -11,7 +12,7 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino'
       useFactory: async (config: ConfigService) => {
 
         // may be you'd want 2kb or 4kb buffer or something for prod. KISS for now.
-        const isDevelopmentMode = ['local', 'dev', 'staging'].includes(
+        const isDevelopmentMode = [NODE_ENVS.local, NODE_ENVS.dev].includes(
           config.get<string>('NODE_ENV').toLowerCase()
         )
         let transport;

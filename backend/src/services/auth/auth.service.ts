@@ -1,14 +1,26 @@
+import { CookieOptions } from 'express'
 import { User } from '@models/user'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService, JwtSignOptions } from '@nestjs/jwt'
+import { NODE_ENVS } from '@utils/constants'
 
 @Injectable()
 export class AuthService {
+
+  private readonly cookieOptions: CookieOptions
+
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService
-  ) {}
+  ) {
+    const isProd = configService.get('NODE_ENV') === NODE_ENVS.prod
+    this.cookieOptions = <CookieOptions>{
+      httpOnly: true,
+      sameSite: true,
+      secure: isProd,
+    }
+  }
 
   signAccessToken(user: User): Promise<string> {
     const { _id: subject, ..._user } = user
@@ -29,5 +41,21 @@ export class AuthService {
       audience: this.configService.get('JWT_AUDIENCE') || '*',
       subject: 'authentication',
     })
+  }
+
+  getTokenSecret(): string {
+    return this.configService.get('JWT_SECRET')
+  }
+
+  getTokenTTL(): string {
+    return this.configService.get('JWT_EXPIRESIN')
+  }
+
+  getRefreshTokenTTL(): string {
+    return this.configService.get('REFRESH_TOKEN_EXPIRESIN')
+  }
+
+  getCookieOptions(): CookieOptions {
+    return this.cookieOptions
   }
 }

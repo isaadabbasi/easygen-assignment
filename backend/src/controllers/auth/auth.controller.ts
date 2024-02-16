@@ -1,14 +1,16 @@
 import { Response } from 'express'
-import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post, Req, Res, UsePipes, ValidationPipe } from '@nestjs/common'
-import { SignInDTO } from '@dto/auth'
+import { Body, Controller, HttpCode, HttpStatus, Post, Res, UsePipes, ValidationPipe } from '@nestjs/common'
+import { SignInDTO, SignUpDTO } from '@dto/auth'
 import { UserRepository } from '@repositories/user'
 import { Exceptions } from '@utils/exceptions'
 import { CryptService } from '@services/crypt'
 import { AuthService } from '@services/auth/auth.service'
 import { Logger } from '@nestjs/common'
+import { User } from '@models/user'
 
 @Controller('api')
 export class AuthController {
+
   private readonly logger = new Logger(AuthController.name);
   constructor(
     private readonly authService: AuthService,
@@ -20,27 +22,59 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UsePipes(ValidationPipe)
   async signIn(@Body() payload: SignInDTO, @Res() response: Response): Promise<any> {
-    this.logger.log('[AuthController] attempt to signin', payload)
+    this.logger.log('[AuthController:SignIn] attempt to signin', payload)
 
     const user = await this.userRepository.findByEmail(payload.email)
-    this.logger.log('[AuthController:SignIn] signin failed: invalid email', payload)
-    // IMP - Intentional, don't want to give exact information of invalid field
-    if (!user) throw Exceptions.InvalidEmailOrPassword()
-
+    if (!user) {
+      this.logger.log('[AuthController:SignIn] signin failed: invalid email', payload)
+      // IMP - Intentional, don't want to give exact information of invalid field
+      throw Exceptions.InvalidEmailOrPassword()
+    }
     const isEqual = await this.cryptService.compare(payload.password, user.password)
-    this.logger.log('[AuthController:SignIn] signin failed: invalid password', payload)
-    if (!isEqual) throw Exceptions.InvalidEmailOrPassword()
+    if (!isEqual) {
+      this.logger.log('[AuthController:SignIn] signin failed: invalid password', payload)
+      throw Exceptions.InvalidEmailOrPassword()
+    }
+    await this.signAndAttachCookies(user, response)
+    this.logger.log('[AuthController:SignIn] successful')
+    response.send('Ok')
+  }
+
+
+  @Post('sign-up')
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(ValidationPipe)
+  async signUp(@Body() payload: SignUpDTO, @Res() response: Response): Promise<any> {
+    this.logger.log('[AuthController:SignUp] attempt to signup', payload)
     
+    const user = await this.userRepository.findByEmail(payload.email)
+    if (user?._id) {
+      throw Exceptions.UserAlreadyExists(`User with email address ${user.email} already exists`)
+    }
+    const pHash = await this.cryptService.hash(payload.password)
+    
+    const newUser = await this.userRepository.saveUserWithHashedPwd(payload, pHash)
+    this.logger.log('[AuthController:SignUp] new user created', newUser._id)
+
+    // IMP - We can add a task in the job queues to dispatch email-address verification email.
+    // [Reason why jobQueue] , because we don't necessarily have to hold the request for that operation
+
+    await this.signAndAttachCookies(newUser, response)
+    this.logger.log('[AuthController:SignUp] successful')
+    response.send('Created')
+  }
+
+  private async signAndAttachCookies(user: User, response: Response): Promise<void> {
     let token = null
     try {
       token = await this.authService.signAccessToken(user)
     } catch(e) {
+      // Extremely Rare chances that it will happen
       this.logger.log('[AuthController:SignIn] sign token failed')
-      response.status(500).send('Something went wrong')
+      throw Exceptions.InternalServerError()
     }
-
-    response.cookie('token', token)
-    response.send('OK')
+    const cookieOptions = this.authService.getCookieOptions()
+    response.cookie('token', token, cookieOptions)
+    return void 0
   }
-
 }

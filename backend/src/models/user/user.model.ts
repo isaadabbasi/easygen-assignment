@@ -10,7 +10,7 @@ import { Base } from 'src/models/base'
 export class User extends Base {
 
   @Index()
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   email: string
 
   @Column({ nullable: true })

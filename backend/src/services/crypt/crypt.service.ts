@@ -11,15 +11,16 @@ import { compare, genSalt, hash } from 'bcryptjs'
 @Injectable()
 export class CryptService {
 
-  async hash(data: string | Buffer, salt: string): Promise<string> {
-    return hash(data, salt);
+  async hash(data: string | Buffer, salt: Promise<string> = this.getSalt()): Promise<string> {
+    return Promise.resolve(salt)
+      .then((salt) => hash(data, salt))
   }
 
   compare(data: string | Buffer, encrypted: string): Promise<boolean> {
-    return compare(data, encrypted);
+    return compare(data, encrypted)
   }
 
   getSalt(): Promise<string> {
-    return genSalt();
+    return genSalt()
   }
 }

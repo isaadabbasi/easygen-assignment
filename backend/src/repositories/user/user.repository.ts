@@ -23,4 +23,9 @@ export class UserRepository extends Repository<User> {
     })
   }
 
+  saveUserWithHashedPwd(user: Partial<User>, hash: string): Promise<User> {
+    const _user = { ...user, password: hash }
+    return this.save(_user)
+  }
+
 }
