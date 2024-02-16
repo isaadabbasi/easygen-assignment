@@ -24,8 +24,9 @@ export class AuthGuard implements CanActivate {
         throw Exceptions.Unauthorised();
       }
 
-      const { _id } = this.authService.decodeJwt<User>(token)
-      const user = await this.userRepository.findOneBy({ _id })
+      const { _id, email } = this.authService.decodeJwt<User>(token)
+      console.log('_id:email', _id, email)
+      const user = await this.userRepository.findOneBy({ email })
       if (!user) {
         this.logger.error('[AuthGuard] user not found for token', _id)
         throw Exceptions.Unauthorised();

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Body, Controller, HttpCode, HttpStatus, Post, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { SignInDTO, SignUpDTO } from '@dto/auth'
 import { UserRepository } from '@repositories/user'
 import { Exceptions } from '@utils/exceptions'
@@ -71,13 +71,34 @@ export class AuthController {
   @Post('sign-out')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  async signOut(request: Request, response: Response): Promise<void> {
+  async signOut(@Req() request: Request, @Res() response: Response): Promise<void> {
     const { _id } = request[ACTIVE_SESSION_KEY]
     if (_id) {
+      this.logger.log('[AuthController:SignOut] signout request by', _id)
       await this.userRepository.update(_id, { refreshToken: null })
     }
+    
     response.clearCookie(TOKENS.TOKEN)
     response.clearCookie(TOKENS.REFRESH_TOKEN)
+    this.logger.log('[AuthController:SignOut] signout sucessful')
+    response.send('Ok')
+  }
+
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  async refreshToken(@Req() request: Request, @Res() response: Response): Promise<void> {
+    const token = request.cookies[TOKENS.TOKEN]
+    const { _id, email } = this.authService.decodeJwt<Pick<User, '_id' | 'email'>>(token)
+    this.logger.log('[AuthController:RefreshToken] refresh token request by', _id)
+    const user = await this.userRepository.findOneBy({ email })
+    try {
+      await this.authService.verifyToken(user.refreshToken, 'refresh')
+    } catch(e) {
+      this.logger.log('[AuthController:RefreshToken] refresh token invalid')
+      throw Exceptions.Forbidden();
+    }
+    await this.updateSessionTokens(user, response)
+    this.logger.log('[AuthController:RefreshToken] tokens refreshed')
     response.send('Ok')
   }
 
