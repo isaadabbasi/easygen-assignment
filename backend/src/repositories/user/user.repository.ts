@@ -16,6 +16,15 @@ export class UserRepository extends Repository<User> {
       where: { email }
     })
   }
+  
+  /**
+   * @notice - {select: false} seem to not work for mongodb, probably a TYPEORM-with-mongodb issue. 
+   * Just a hacky work around
+   */
+  trimSecretFields(user: User): Partial<User> {
+    const {password: _, refreshToken, ..._user} = user
+    return _user
+  }
 
   saveUserWithHashedPwd(user: Partial<User>, hash: string): Promise<User> {
     const _user = { ...user, password: hash }

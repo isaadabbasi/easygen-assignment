@@ -20,27 +20,26 @@ export class AuthGuard implements CanActivate {
       const token = request.cookies[TOKENS.TOKEN];
 
       if (!token) {
-        this.logger.error('[AuthGuard] token not found in request')
+        this.logger.log('[AuthGuard] token not found in request')
         throw Exceptions.Unauthorised();
       }
 
       const { _id, email } = this.authService.decodeJwt<User>(token)
-      console.log('_id:email', _id, email)
       const user = await this.userRepository.findOneBy({ email })
       if (!user) {
-        this.logger.error('[AuthGuard] user not found for token', _id)
+        this.logger.log('[AuthGuard] user not found for token', _id)
         throw Exceptions.Unauthorised();
       }
 
       try {
         await this.authService.verifyToken(token, 'access')
       } catch(e) {
-        this.logger.error('[AuthGuard] token unverifiable')
+        this.logger.log('[AuthGuard] token unverifiable')
         throw Exceptions.Unauthorised();
       }
 
       request[ACTIVE_SESSION_KEY] = { _id, email: user.email };
-      this.logger.error('[AuthGuard] token verified for user', _id)
+      this.logger.log('[AuthGuard] token verified for user', _id)
       return true;
     } catch (error) {
       throw Exceptions.Unauthorised();

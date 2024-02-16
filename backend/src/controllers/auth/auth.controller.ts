@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common'
 import { SignInDTO, SignUpDTO } from '@dto/auth'
 import { UserRepository } from '@repositories/user'
 import { Exceptions } from '@utils/exceptions'
@@ -100,6 +100,16 @@ export class AuthController {
     await this.updateSessionTokens(user, response)
     this.logger.log('[AuthController:RefreshToken] tokens refreshed')
     response.send('Ok')
+  }
+
+  @Get('/protected')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  async me(@Req() request: Request, @Res() response: Response) {
+    const { email } = request[ACTIVE_SESSION_KEY]
+    const user = await this.userRepository.findByEmail(email)
+    const _user = this.userRepository.trimSecretFields(user)
+    response.send(_user)
   }
 
   private async updateSessionTokens(user: User, response: Response): Promise<void> {
