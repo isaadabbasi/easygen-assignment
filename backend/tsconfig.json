@@ -19,8 +19,13 @@
     "noFallthroughCasesInSwitch": false,
     
     "paths": {
+      "@controllers/*": ["src/controllers/*"],
       "@modules/*": ["./src/modules/*"],
       "@models/*": ["src/models/*"],
+      "@services/*": ["src/services/*"],
+      "@dto/*": ["src/dto/*"],
+      "@repositories/*": ["src/repositories/*"],
+      "@utils/*": ["src/utils/*"],
     }
   },
 }
