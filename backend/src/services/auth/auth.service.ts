@@ -30,16 +30,28 @@ export class AuthService {
     }, {
       // IMPORTANT NOTES - 
       algorithm: 'HS256', // Symmetric key encryption algorithm
-      // We should be using a asymetric-key encryption 'RS256' | 'RS512' but for that -
-      // we will have to use a key-management service (KMS) as we can not have a private and public file as a state on machine
-      // we must keep our api-servers stataless. so, for a test, it might be a showoff of skills. 
-      // But wanted to let the team know. BEST PRACTICE CONSIDERED & FOLLOWED.
-      // algorithm: 'RS256' | 'RS512'
+      // Its fine to use symmetric key encryption for short lived sessions, 
+      // TIP: make sure to not use an easily guessable JWT_SECRET 
       secret: this.configService.getOrThrow('JWT_SECRET'),
       issuer: this.configService.getOrThrow('JWT_ISSUER'),
       expiresIn: this.configService.getOrThrow('JWT_EXPIRESIN'),
       audience: this.configService.get('JWT_AUDIENCE') || '*',
       subject: 'authentication',
+    })
+  }
+
+  signRefreshToken(user: User): Promise<string> {
+    const { _id, email } = user
+    return this.jwtService.signAsync({ _id, email }, {
+      // IMPORTANT NOTES - 
+      algorithm: 'HS256', // Symmetric key encryption algorithm
+      // We should be using a asymetric-key encryption 'RS256' | 'RS512' but for that -
+      // we will have to use a key-management service (KMS) as we can not have a private and public file as a state on machine
+      // we must keep our api-servers stataless. so, for a test, it might be a showoff of skills. 
+      // But wanted to let the team know. BEST PRACTICE CONSIDERED & FOLLOWED.
+      // algorithm: 'RS256' | 'RS512'
+      secret: this.configService.getOrThrow('REFRESH_TOKEN_SECRET'),
+      expiresIn: this.configService.getOrThrow('REFRESH_TOKEN_EXPIRESIN'),
     })
   }
 

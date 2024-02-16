@@ -5,3 +5,7 @@ export const NODE_ENVS = {
   prod: 'prod',
 }
 
+export const TOKENS = {
+  TOKEN: 'TOKEN',
+  REFRESH_TOKEN: 'REFRESH_TOKEN'
+}

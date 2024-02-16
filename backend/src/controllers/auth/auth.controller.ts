@@ -7,6 +7,7 @@ import { CryptService } from '@services/crypt'
 import { AuthService } from '@services/auth/auth.service'
 import { Logger } from '@nestjs/common'
 import { User } from '@models/user'
+import { TOKENS } from '@utils/constants'
 
 @Controller('api')
 export class AuthController {
@@ -35,7 +36,8 @@ export class AuthController {
       this.logger.log('[AuthController:SignIn] signin failed: invalid password', payload)
       throw Exceptions.InvalidEmailOrPassword()
     }
-    await this.signAndAttachCookies(user, response)
+    await this.updateSessionTokens(user, response)
+
     this.logger.log('[AuthController:SignIn] successful')
     response.send('Ok')
   }
@@ -59,22 +61,28 @@ export class AuthController {
     // IMP - We can add a task in the job queues to dispatch email-address verification email.
     // [Reason why jobQueue] , because we don't necessarily have to hold the request for that operation
 
-    await this.signAndAttachCookies(newUser, response)
+    await this.updateSessionTokens(newUser, response)
+
     this.logger.log('[AuthController:SignUp] successful')
     response.send('Created')
   }
 
-  private async signAndAttachCookies(user: User, response: Response): Promise<void> {
+  private async updateSessionTokens(user: User, response: Response): Promise<void> {
     let token = null
+    let refreshToken = null
     try {
       token = await this.authService.signAccessToken(user)
+      refreshToken = await this.authService.signRefreshToken(user)
     } catch(e) {
       // Extremely Rare chances that it will happen
-      this.logger.log('[AuthController:SignIn] sign token failed')
+      this.logger.log('[AuthController] sign token failed')
       throw Exceptions.InternalServerError()
     }
+
+    await this.userRepository.update(user._id, { refreshToken })
+    this.logger.log('[AuthController] refresh token updated')
     const cookieOptions = this.authService.getCookieOptions()
-    response.cookie('token', token, cookieOptions)
-    return void 0
+    response.cookie(TOKENS.TOKEN, token, cookieOptions)
   }
+
 }

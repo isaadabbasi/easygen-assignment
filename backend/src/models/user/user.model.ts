@@ -19,4 +19,7 @@ export class User extends Base {
   @Column({ nullable: false, select: false })
   password: string
 
+  @Column({ nullable: true, select: false })
+  refreshToken: string
+
 }
