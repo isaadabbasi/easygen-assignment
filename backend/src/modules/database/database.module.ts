@@ -19,9 +19,9 @@ export const DatabaseModule = TypeOrmModule.forRootAsync({
     if (isDevelopmentMode) {
       return {
         type: 'mongodb',
+        database: configService.get('DB_APP') || 'app',
         host: configService.get('DB_HOST') || 'localhost',
         port: Number.parseInt(configService.get('DB_PORT')) || 27017,
-        appname: configService.get('DB_APP') || 'app',
         entities: [
           User
         ],
