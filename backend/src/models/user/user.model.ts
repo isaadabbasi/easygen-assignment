@@ -4,7 +4,7 @@ import {
   Index,
 } from 'typeorm';
 
-import { Base } from 'src/models/base'
+import { Base } from '@models/base'
 
 @Entity()
 export class User extends Base {
