@@ -41,8 +41,8 @@
   width: 100%;
 }
 
-#sign-up-form button,
-#sign-in-form button {
+button,
+button {
   background-color: var(--primary-color);
   border-radius: 3px;
   border: none;
@@ -54,8 +54,8 @@
   width: 100%;
 }
 
-#sign-up-form button:hover,
-#sign-in-form button:hover {
+button:hover,
+button:hover {
   background-color: var(--primary-dark-color);
 }
 

@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import { SignInPage, SignUpPage } from 'src/pages'
-import { ProtectedRoute } from './protected'
+import { SignInPage, SignUpPage, HomePage } from "src/pages";
+import { ProtectedRoute } from "./protected";
 
 export const AppRoutes = () => {
   return (
@@ -14,7 +14,7 @@ export const AppRoutes = () => {
           path="home"
           element={
             <ProtectedRoute>
-              <SignUpPage />
+              <HomePage />
             </ProtectedRoute>
           }
         />
@@ -22,4 +22,4 @@ export const AppRoutes = () => {
       </Routes>
     </BrowserRouter>
   );
-}
+};

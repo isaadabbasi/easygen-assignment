@@ -7,8 +7,12 @@ export class PersistantStorageService {
     return localStorage.getItem(AppSessionId);
   }
 
-  public setAppSessionId(value: string) {
+  public setAppSessionId(value: string): void {
     localStorage.setItem(AppSessionId, value);
+  }
+
+  public removeSessionId(): void {
+    localStorage.removeItem(AppSessionId);
   }
 }
 

@@ -1,0 +1,9 @@
+#home-page .container {
+  margin: 0 auto;
+  text-align: center;
+  width: 400px;
+}
+
+#home-page img {
+  filter: brightness(1.5);
+}
