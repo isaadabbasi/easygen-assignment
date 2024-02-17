@@ -1,8 +1,9 @@
-import { Navigate } from "react-router"
+import { Navigate } from "react-router";
+import { persistantStorageService } from 'src/services'
 
 const isUserAuthenticated = (): boolean => {
-  const sessionId = localStorage.getItem('easygen-session-status')
-  return Boolean(sessionId)
+  const sessionId = persistantStorageService.getAppSessionId()
+  return Boolean(sessionId);
 };
 
 export const ProtectedRoute = ({ children }: any) => {

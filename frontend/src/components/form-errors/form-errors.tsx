@@ -5,8 +5,11 @@ interface IFormErrorsProps {
 }
 
 export const FormErrors = (props: IFormErrorsProps) => {
-  const errors = props.messages.map((msg) => <li>{msg}</li>);
-  
+  // IMP - It's not recommended to use key={index}(index as key)
+  // But, we don't have better options for now
+  const errors = props.messages.map(
+    (msg, index) => <li key={index}>{msg}</li>
+  );
   if (errors.length === 0) return null;
 
   return (

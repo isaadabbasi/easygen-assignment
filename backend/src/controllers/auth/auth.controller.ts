@@ -40,7 +40,7 @@ export class AuthController {
     await this.updateSessionTokens(user, response)
 
     this.logger.log('[AuthController:SignIn] successful')
-    response.send('Ok')
+    response.send(user._id)
   }
 
 
@@ -65,7 +65,7 @@ export class AuthController {
     await this.updateSessionTokens(newUser, response)
 
     this.logger.log('[AuthController:SignUp] successful')
-    response.send('Created')
+    response.send(newUser._id)
   }
 
   @Post('sign-out')
@@ -81,7 +81,7 @@ export class AuthController {
     response.clearCookie(TOKENS.TOKEN)
     response.clearCookie(TOKENS.REFRESH_TOKEN)
     this.logger.log('[AuthController:SignOut] signout sucessful')
-    response.send('Ok')
+    response.send()
   }
 
   @Post('refresh-token')
@@ -99,7 +99,7 @@ export class AuthController {
     }
     await this.updateSessionTokens(user, response)
     this.logger.log('[AuthController:RefreshToken] tokens refreshed')
-    response.send('Ok')
+    response.send()
   }
 
   @Get('/protected')

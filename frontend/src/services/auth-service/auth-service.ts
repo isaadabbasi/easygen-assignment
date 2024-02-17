@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import { httpService, HttpService } from "src/services";
 import { constants } from "src/utils";
 
@@ -9,28 +8,36 @@ const { APIRoutes } = constants;
 export class AuthService {
   constructor(private httpService: HttpService) {}
 
-  async signUp(payload: IAuth.ISignUpPayload): Promise<void> {
+  private async post<
+    T = (typeof APIRoutes)[keyof typeof APIRoutes],
+    U = IAuth.ISignUpPayload | IAuth.ISignUpPayload | void,
+    V = string | void
+  >(route: T, payload: U): Promise<V> {
     try {
-      await this.httpService.getHttpClient().post(APIRoutes.SignUp, payload);
-    } catch (error) {
-      throw (error as AxiosError).response?.data;
+      const response = await this.httpService
+        .getHttpClient()
+        .post(route as string, payload);
+
+      return response.data;
+    } catch (e: any) {
+      const { message } = e.response.data;
+      // e: AxiosError<string | string[]> but weird generics by axios that's why using :any
+      if (typeof message === "string") {
+        return Promise.reject([message]);
+      }
+      return Promise.reject(message);
     }
   }
+  async signUp(payload: IAuth.ISignUpPayload): Promise<string> {
+    return this.post(APIRoutes.SignUp, payload);
+  }
 
-  async signIn(payload: IAuth.ISignInPayload): Promise<void> {
-    try {
-      await this.httpService.getHttpClient().post(APIRoutes.SignIn, payload);
-    } catch (error) {
-      throw (error as AxiosError).response?.data;
-    }
+  async signIn(payload: IAuth.ISignInPayload): Promise<string> {
+    return this.post(APIRoutes.SignIn, payload);
   }
 
   async signOut(): Promise<void> {
-    try {
-      await this.httpService.getHttpClient().post(APIRoutes.SignOut);
-    } catch (error) {
-      throw (error as AxiosError).response?.data;
-    }
+    return this.post(APIRoutes.SignOut, void 0);
   }
 }
 

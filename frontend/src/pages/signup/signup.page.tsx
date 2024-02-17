@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { SignUpForm } from "src/components";
 import { IAuth } from "src/defs";
-import { authService } from "src/services";
+import { authService, persistantStorageService } from "src/services";
 import { constants } from "src/utils";
 
 const { AppRoutes } = constants;
@@ -16,20 +16,21 @@ const { AppRoutes } = constants;
  */
 export function SignUpPage() {
   const navigateTo = useNavigate();
-  const [signUpFormErrors, setSignUpFormErrors] = useState<string[]>([]);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
 
   const handleSubmit = async (payload: IAuth.ISignUpPayload) => {
     try {
-      await authService.signUp(payload);
+      const sessionId = await authService.signUp(payload);
+      persistantStorageService.setAppSessionId(sessionId);
+      navigateTo(AppRoutes.Home);
     } catch (e) {
-      setSignUpFormErrors(["something went wrong"]);
+      setFormErrors(e as string[]);
     }
-    navigateTo(AppRoutes.Home);
   };
 
   return (
     <div id="sign-up-page">
-      <SignUpForm handleSubmit={handleSubmit} errors={signUpFormErrors} />
+      <SignUpForm handleSubmit={handleSubmit} errors={formErrors} />
     </div>
   );
 }

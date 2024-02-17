@@ -4,6 +4,7 @@ import { SignInForm } from 'src/components'
 import { IAuth } from 'src/defs'
 import { authService } from 'src/services'
 import { constants } from 'src/utils'
+import { persistantStorageService } from 'src/services'
 
 const { AppRoutes } = constants
 
@@ -16,19 +17,20 @@ const { AppRoutes } = constants
  */
 export function SignInPage() {
   const navigateTo = useNavigate();
-  const [signInFormErrors, setSignUpFormErrors] = useState<string[]>([]);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
   const handleSubmit = async (payload: IAuth.ISignInPayload) => {
     try {
-      await authService.signIn(payload);
+      const sessionId = await authService.signIn(payload);
+      persistantStorageService.setAppSessionId(sessionId);
+      navigateTo(AppRoutes.Home);
     } catch (e) {
-      setSignUpFormErrors(["something went wrong"]);
+      setFormErrors(e as string[]);
     }
-    navigateTo(AppRoutes.Home);
   }
 
   return (
     <div id="sign-in-page">
-      <SignInForm handleSubmit={handleSubmit} errors={signInFormErrors} />
+      <SignInForm handleSubmit={handleSubmit} errors={formErrors} />
     </div>
   );
 }
