@@ -1,11 +1,17 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { FormErrors } from 'src/components'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FormErrors } from "src/components";
+import { IAuth } from "src/defs";
 
-export const SignInForm = (): JSX.Element => {
+interface ISignInFormProps {
+  handleSubmit: (payload: IAuth.ISignInPayload) => void;
+  errors: string[];
+}
+export const SignInForm = (props: ISignInFormProps): JSX.Element => {
+  const { errors, handleSubmit } = props;
   const navigate = useNavigate();
 
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo, setUserInfo] = useState<IAuth.ISignInPayload>({
     email: "",
     password: "",
   });
@@ -19,14 +25,16 @@ export const SignInForm = (): JSX.Element => {
     });
   };
 
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const _handleSubmit = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
-    console.log(userInfo);
+    handleSubmit(userInfo);
   };
 
-  const navigateToSignUp =(e: React.MouseEvent<HTMLAnchorElement>) => {
+  const navigateToSignUp = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    navigate('/sign-up')
+    navigate("/sign-up");
   };
 
   return (
@@ -52,10 +60,15 @@ export const SignInForm = (): JSX.Element => {
           onChange={onInputChange}
         />
       </div>
-      <FormErrors messages={[]}/>
-      <button type="submit">Sign In</button>
+      <FormErrors messages={errors} />
+      <button type="submit" onClick={_handleSubmit}>
+        Sign In
+      </button>
       <p className="rdr">
-        Create an account! <a href="#" onClick={navigateToSignUp}>Sign Up</a>
+        Create an account!{" "}
+        <a href="#" onClick={navigateToSignUp}>
+          Sign Up
+        </a>
       </p>
     </form>
   );

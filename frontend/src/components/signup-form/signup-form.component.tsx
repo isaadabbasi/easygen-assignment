@@ -1,11 +1,17 @@
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom'
-import { FormErrors } from 'src/components'
+import { useNavigate } from "react-router-dom";
+import { FormErrors } from "src/components";
+import { IAuth } from "src/defs";
 
-export function SignUpForm() {
+interface ISignUpFormProps {
+  handleSubmit: (payload: IAuth.ISignUpPayload) => void;
+  errors: string[]
+}
+export function SignUpForm(props: ISignUpFormProps) {
+  const { errors, handleSubmit } = props;
   const navigate = useNavigate();
 
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo, setUserInfo] = useState<IAuth.ISignUpPayload>({
     name: "",
     email: "",
     password: "",
@@ -20,15 +26,17 @@ export function SignUpForm() {
     });
   };
 
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const _handleSubmit = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
-    console.log(userInfo);
-  }
+    handleSubmit(userInfo);
+  };
 
-  const navigateToSignIn =(e: React.MouseEvent<HTMLAnchorElement>) => {
+  const navigateToSignIn = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    navigate('/')
-  }
+    navigate("/");
+  };
 
   return (
     <form id="sign-up-form">
@@ -63,10 +71,15 @@ export function SignUpForm() {
           onChange={onInputChange}
         />
       </div>
-      <FormErrors messages={[]}/>
-      <button type="submit" onClick={handleSubmit}>Sign Up</button>
+      <FormErrors messages={errors} />
+      <button type="submit" onClick={_handleSubmit}>
+        Sign Up
+      </button>
       <p className="rdr">
-        Already have an account? <a href="#" onClick={navigateToSignIn}>Sign In</a>
+        Already have an account?{" "}
+        <a href="#" onClick={navigateToSignIn}>
+          Sign In
+        </a>
       </p>
     </form>
   );
