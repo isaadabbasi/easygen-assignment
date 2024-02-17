@@ -1,0 +1,11 @@
+#form-errors {
+  color: var(--error-color);
+}
+
+#form-errors .label {
+  font-weight: bold;
+}
+
+#form-errors ul {
+  margin-top:4px;
+}
