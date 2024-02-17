@@ -1,7 +1,10 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { FormErrors } from 'src/components'
 
 export const SignInForm = (): JSX.Element => {
+  const navigate = useNavigate();
+
   const [userInfo, setUserInfo] = useState({
     email: "",
     password: "",
@@ -20,6 +23,12 @@ export const SignInForm = (): JSX.Element => {
     e.preventDefault();
     console.log(userInfo);
   };
+
+  const navigateToSignUp =(e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    navigate('/sign-up')
+  };
+
   return (
     <form id="sign-in-form">
       <h2 className="title">Sign In</h2>
@@ -46,7 +55,7 @@ export const SignInForm = (): JSX.Element => {
       <FormErrors messages={[]}/>
       <button type="submit">Sign In</button>
       <p className="rdr">
-        Create an account! <a href="#">Sign In</a>
+        Create an account! <a href="#" onClick={navigateToSignUp}>Sign Up</a>
       </p>
     </form>
   );

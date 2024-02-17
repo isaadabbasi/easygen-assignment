@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom'
 import { FormErrors } from 'src/components'
 
 export function SignUpForm() {
+  const navigate = useNavigate();
+
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",
@@ -20,6 +23,11 @@ export function SignUpForm() {
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     console.log(userInfo);
+  }
+
+  const navigateToSignIn =(e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    navigate('/')
   }
 
   return (
@@ -58,7 +66,7 @@ export function SignUpForm() {
       <FormErrors messages={[]}/>
       <button type="submit" onClick={handleSubmit}>Sign Up</button>
       <p className="rdr">
-        Already have an account? <a href="#">Sign In</a>
+        Already have an account? <a href="#" onClick={navigateToSignIn}>Sign In</a>
       </p>
     </form>
   );
