@@ -1,25 +1,22 @@
-import {
-  Column,
-  Entity,
-  Index,
-} from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 
-import { Base } from '@models/base'
+import { Base } from '@models/base';
 
 @Entity()
 export class User extends Base {
-
   @Index()
   @Column({ nullable: false, unique: true })
-  email: string
+  email: string;
 
   @Column({ nullable: true })
-  name: string
+  name: string;
 
   @Column({ nullable: false, select: false })
-  password: string
+  password: string;
 
   @Column({ nullable: true, select: false })
-  refreshToken: string
+  refreshToken: string;
 
+  @Column({ nullable: true, select: false })
+  sessionId: string;
 }

@@ -28,7 +28,8 @@ export class SignUpDTO {
   @IsString()
   @MinLength(8)
   @Matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[\W_]).+$/, {
-    message: 'Password must contain atleast 1 special character, 1 letter and a number',
+    message:
+      'Password must contain atleast 1 special character, 1 letter and a number',
   })
   @IsNotEmpty()
   password: string;

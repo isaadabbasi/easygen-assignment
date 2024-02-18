@@ -1,1 +1,1 @@
-export { CryptService } from './crypt.service'
+export { CryptService } from './crypt.service';

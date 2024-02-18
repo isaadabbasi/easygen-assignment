@@ -1,1 +1,1 @@
-export { SignInDTO, SignUpDTO } from './auth'
+export { SignInDTO, SignUpDTO } from './auth';
