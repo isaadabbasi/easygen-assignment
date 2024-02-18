@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { NODE_ENVS } from '@utils/constants'
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { NODE_ENVS } from '@utils/constants';
 
-import { LoggerModule as PinoLoggerModule } from 'nestjs-pino'
+import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
@@ -10,21 +10,20 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino'
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => {
-
         // may be you'd want 2kb or 4kb buffer or something for prod. KISS for now.
-        const isDevelopmentMode = [
-          NODE_ENVS.local,
-          NODE_ENVS.dev
-        ].includes(config.get<string>('NODE_ENV').toLowerCase())
+        const isDevelopmentMode = [NODE_ENVS.local, NODE_ENVS.dev].includes(
+          config.get<string>('NODE_ENV').toLowerCase(),
+        );
 
         let transport;
-        if (isDevelopmentMode) { // true all the time for NOW.
+        if (isDevelopmentMode) {
+          // true all the time for NOW.
           transport = {
             target: 'pino-pretty',
             options: {
               singleLine: true,
             },
-          }
+          };
         }
 
         return {
@@ -32,10 +31,8 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino'
             transport,
           },
         };
-
       },
     }),
   ],
 })
-
 export class LoggerModule {}

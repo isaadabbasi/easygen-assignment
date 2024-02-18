@@ -1,1 +1,1 @@
-export { Base } from './base.model'
+export { Base } from './base.model';
