@@ -8,3 +8,11 @@ export interface ISignUpPayload {
   email: string;
   password: string;
 }
+
+export interface IUser {
+  _id: string;
+  createdAt: string;
+  updatedAt: string;
+  email: string;
+  name: string;
+}
