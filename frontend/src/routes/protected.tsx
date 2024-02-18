@@ -1,13 +1,16 @@
+import { ReactNode } from 'react'
 import { Navigate } from "react-router";
-import { persistantStorageService } from 'src/services'
+import { AppRoutes } from 'src/utils/constants'
 
-const isUserAuthenticated = (): boolean => {
-  const sessionId = persistantStorageService.getAppSessionId()
-  return Boolean(sessionId);
-};
+interface IProtecteRouteProps {
+  canActivate: () => boolean
+  fallback: (typeof AppRoutes)[keyof typeof AppRoutes]
+  children: ReactNode;
+}
+export const ProtectedRoute = (props: IProtecteRouteProps) => {
+  const { canActivate, children, fallback } = props
 
-export const ProtectedRoute = ({ children }: any) => {
-  return isUserAuthenticated() ?
+  return canActivate() ?
     <>{children}</> :
-    <Navigate to="/" />
+    <Navigate to={fallback} />
 };

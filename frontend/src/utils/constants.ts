@@ -7,7 +7,7 @@ export const APIRoutes = {
 } as const;
 
 export const AppRoutes = {
-  SignIn: "/",
+  SignIn: "/sign-in",
   SignUp: "/sign-up",
   Home: "/home",
 } as const;

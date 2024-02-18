@@ -21,6 +21,7 @@ export class HttpService {
       async (error) => {
         const initialRequest = error.config;
 
+        // We don't need to refresh-token on 401 if request is signin or signup
         const pathname = new URL(error.request.responseURL).pathname
         if ([
           APIRoutes.SignIn,
