@@ -12,6 +12,9 @@ body {
   --primary-dark-color: #0056b3;
   --border-color: #ccc;
   --error-color: #ff5151;
+  --error-dark-color: #ec1c1c;
+  --border-radius-basic: 3px;
+  --box-shadow: 2px 2px 8px var(--border-color);
 }
 
 code {

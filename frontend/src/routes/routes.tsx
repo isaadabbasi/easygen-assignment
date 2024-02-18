@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { SignInPage, SignUpPage, HomePage } from "src/pages";
 import { ProtectedRoute } from "./protected";
+import { ErrorBoundary } from 'src/components'
 
 export const AppRoutes = () => {
   return (
@@ -14,7 +15,9 @@ export const AppRoutes = () => {
           path="home"
           element={
             <ProtectedRoute>
-              <HomePage />
+              <ErrorBoundary>
+                <HomePage />
+              </ErrorBoundary>
             </ProtectedRoute>
           }
         />

@@ -9,9 +9,9 @@
 #sign-up-form,
 #sign-in-form {
   background: white;
-  border-radius: 3px;
+  border-radius: var(--border-radius-basic);
   border: 1px solid var(--border-color);
-  box-shadow: 2px 2px 8px var(--border-color);
+  box-shadow: var(--box-shadow);
   padding: 16px;
   width: 380px;
 }
@@ -34,7 +34,7 @@
 
 #sign-up-form input[type='email'], input[type='password'], input[type='text'],
 #sign-in-form input[type='email'], input[type='password'] {
-  border-radius: 3px;
+  border-radius: var(--border-radius-basic);
   border: 1px solid var(--border-color);
   box-sizing: border-box;
   padding: 8px;
@@ -43,8 +43,7 @@
 
 button,
 button {
-  background-color: var(--primary-color);
-  border-radius: 3px;
+  border-radius: var(--border-radius-basic);
   border: none;
   color: #fff;
   cursor: pointer;
@@ -54,9 +53,22 @@ button {
   width: 100%;
 }
 
-button:hover,
-button:hover {
+button.primary {
+  color: white;
+  background-color: var(--primary-color);
+}
+
+button.primary:hover {
   background-color: var(--primary-dark-color);
+}
+
+button.error {
+  color: white;
+  background-color: var(--error-color);
+}
+
+button.error:hover {
+  background-color: var(--error-dark-color);
 }
 
 #sign-up-form .rdr,

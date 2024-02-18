@@ -1,3 +1,5 @@
 export { SignInForm } from './signin-form'
 export { SignUpForm } from './signup-form'
 export { FormErrors } from './form-errors'
+export { ErrorBoundary } from './error-boundary'
+export { ErrorDialog } from './error-dialog'

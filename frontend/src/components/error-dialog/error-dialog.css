@@ -1,0 +1,13 @@
+#error-dialog dialog {
+  border-color: var(--error-color);
+  border-radius: var(--border-radius-basic);
+  box-shadow: var(--box-shadow);
+
+  max-width: 380px;
+  width: 380px;
+  margin-top: 16px;
+}
+
+#error-dialog h3 {
+  text-transform: uppercase;
+}

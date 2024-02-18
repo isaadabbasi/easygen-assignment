@@ -1,9 +1,12 @@
-import { authService, persistantStorageService } from "src/services";
-import "./home.page.css";
-import { constants } from "src/utils";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { authService, persistantStorageService } from "src/services";
+import { constants } from "src/utils";
 import { IAuth } from "src/defs";
+
+import "./home.page.css";
+
 
 const { AppRoutes } = constants;
 
@@ -45,7 +48,8 @@ export function HomePage() {
           alt="peanut-butter-jelly-time.gif"
         />
         <br />
-        <button onClick={onClick}>Sign Out</button>
+        <br />
+        <button className="error" onClick={onClick}>Sign Out</button>
       </div>
     </div>
   );

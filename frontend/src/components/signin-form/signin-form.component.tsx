@@ -61,7 +61,7 @@ export const SignInForm = (props: ISignInFormProps): JSX.Element => {
         />
       </div>
       <FormErrors messages={errors} />
-      <button type="submit" onClick={_handleSubmit}>
+      <button className="primary" type="submit" onClick={_handleSubmit}>
         Sign In
       </button>
       <p className="rdr">

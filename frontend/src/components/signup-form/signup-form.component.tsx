@@ -72,7 +72,7 @@ export function SignUpForm(props: ISignUpFormProps) {
         />
       </div>
       <FormErrors messages={errors} />
-      <button type="submit" onClick={_handleSubmit}>
+      <button className="primary" type="submit" onClick={_handleSubmit}>
         Sign Up
       </button>
       <p className="rdr">
