@@ -1,7 +1,7 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, HttpStatusCode } from "axios";
 import { constants, envs } from "src/utils";
 
-const { APIRoutes } = constants;
+const { APIRoutes, AppSessionId } = constants;
 
 export class HttpService {
   private httpClient: AxiosInstance;
@@ -38,7 +38,7 @@ export class HttpService {
         } = error.response;
 
         if (
-          status === 401 &&
+          status === HttpStatusCode.Unauthorized &&
           message === "Unauthorised" &&
           !initialRequest._retry
         ) {
@@ -46,7 +46,13 @@ export class HttpService {
 
           console.log("Initial Request: ", initialRequest);
 
-          await this.httpClient.post(APIRoutes.RefreshToken);
+          const rResponse = await this.httpClient.post(APIRoutes.RefreshToken);
+          if (rResponse.status === HttpStatusCode.Forbidden) {
+            // remove local session n reload required.
+            localStorage.removeItem(AppSessionId)
+            // eslint-disable-next-line no-restricted-globals
+            return location.reload()
+          }
 
           return axios(initialRequest);
         }

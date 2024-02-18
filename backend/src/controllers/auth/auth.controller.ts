@@ -21,6 +21,7 @@ import { Logger } from '@nestjs/common';
 import { User } from '@models/user';
 import { ACTIVE_SESSION_KEY, TOKENS } from '@utils/constants';
 import { AuthGuard } from '@services/auth-guard';
+import { ObjectId } from 'typeorm'
 
 @Controller('api')
 export class AuthController {
@@ -106,15 +107,10 @@ export class AuthController {
     @Res() response: Response,
   ): Promise<void> {
     const { _id } = request[ACTIVE_SESSION_KEY];
-    if (_id) {
-      this.logger.log('[AuthController:SignOut] signout request by', _id);
-      await this.userRepository.update(_id, {
-        refreshToken: null,
-        sessionId: null,
-      });
-    }
+    this.logger.log('[AuthController:SignOut] signout request by', _id);
+    
+    await this.removeSessionTokens(_id, response);
 
-    response.clearCookie(TOKENS.TOKEN);
     this.logger.log('[AuthController:SignOut] signout sucessful');
     response.send();
   }
@@ -140,6 +136,7 @@ export class AuthController {
       );
     } catch (e) {
       this.logger.log('[AuthController:RefreshToken] refresh token invalid');
+      await this.removeSessionTokens(_id, response);
       throw Exceptions.Forbidden();
     }
     await this.updateSessionTokens(user, response);
@@ -155,6 +152,18 @@ export class AuthController {
     const user = await this.userRepository.findByEmail(email);
     const _user = this.userRepository.trimSecretFields(user);
     response.send(_user);
+  }
+
+  private async removeSessionTokens(
+    _id: ObjectId,
+    response: Response,
+  ): Promise<void> {
+    await this.userRepository.update(_id, {
+      refreshToken: null,
+      sessionId: null,
+    });
+    response.clearCookie(TOKENS.TOKEN);
+    response.clearCookie(TOKENS.SESSION_ID);
   }
 
   private async updateSessionTokens(

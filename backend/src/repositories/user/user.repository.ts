@@ -19,7 +19,7 @@ export class UserRepository extends Repository<User> {
    * Just a hacky work around
    */
   trimSecretFields(user: User): Partial<User> {
-    const { password: _, refreshToken, secret, ..._user } = user;
+    const { password: _, refreshToken, sessionId, ..._user } = user;
     return _user;
   }
 
