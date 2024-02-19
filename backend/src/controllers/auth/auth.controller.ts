@@ -122,13 +122,21 @@ export class AuthController {
     @Res() response: Response,
   ): Promise<void> {
     const token = request.cookies[TOKENS.TOKEN];
-    const { _id, email } =
+    const sessionId = request.cookies[TOKENS.SESSION_ID];
+    const { _id, email = '' } =
       this.authService.decodeJwt<Pick<User, '_id' | 'email'>>(token);
     this.logger.log(
       '[AuthController:RefreshToken] refresh token request by',
       _id,
     );
     const user = await this.userRepository.findOneBy({ email });
+
+    if (!user?.refreshToken || user?.sessionId !== sessionId) {
+      this.logger.log('[AuthController:RefreshToken] tweaked or invalid cookies');
+      await this.removeSessionTokens(_id, response);
+      throw Exceptions.Forbidden();
+    }
+
     try {
       await this.authService.verifyToken(
         user.refreshToken,
