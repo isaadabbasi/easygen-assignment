@@ -21,7 +21,7 @@ import { Logger } from '@nestjs/common';
 import { User } from '@models/user';
 import { ACTIVE_SESSION_KEY, TOKENS } from '@utils/constants';
 import { AuthGuard } from '@services/auth-guard';
-import { ObjectId } from 'typeorm'
+import { ObjectId } from 'typeorm';
 
 @Controller('api')
 export class AuthController {
@@ -108,7 +108,7 @@ export class AuthController {
   ): Promise<void> {
     const { _id } = request[ACTIVE_SESSION_KEY];
     this.logger.log('[AuthController:SignOut] signout request by', _id);
-    
+
     await this.removeSessionTokens(_id, response);
 
     this.logger.log('[AuthController:SignOut] signout sucessful');

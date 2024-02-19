@@ -1,4 +1,3 @@
-import * as request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as cookieParser from 'cookie-parser';
@@ -9,48 +8,18 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from '@services/auth';
 import { CryptService } from '@services/crypt';
-import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '@models/user';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from '@repositories/user';
 import { DataSource } from 'typeorm';
-import { SignInDTO, SignUpDTO } from '@dto/auth';
+import { AuthGuard } from '@services/auth-guard';
 
-const makeSignUpRequest = async (
-  app: INestApplication,
-  { email, password, name }: SignUpDTO,
-) => {
-  const dto = new SignUpDTO();
-  dto.email = email;
-  dto.name = name;
-  dto.password = password;
-
-  return request(app.getHttpServer()).post('/api/sign-up').send(dto);
-};
-
-const makeSignInRequest = async (
-  app: INestApplication,
-  { email, password }: SignInDTO,
-) => {
-  const dto = new SignInDTO();
-
-  dto.email = email;
-  dto.password = password;
-
-  return request(app.getHttpServer()).post('/api/sign-in').send(dto);
-};
-
-const makeSignOutRequest = async (
-  app: INestApplication,
-  accessToken: string,
-) => {
-  return (
-    request(app.getHttpServer())
-      // TODO should we be doing it like: session=eyJqd3QiOiJ...
-      .set('Cookie', [accessToken])
-      .post('/api/sign-out')
-      .send()
-  );
-};
+import {
+  makeSignInRequest,
+  makeSignOutRequest,
+  makeSignUpRequest,
+  changeLastCharOfCookie,
+} from '@utils/test-helpers';
 
 describe('AuthController', () => {
   let mongod: MongoMemoryServer;
@@ -76,10 +45,8 @@ describe('AuthController', () => {
         JwtService,
         CryptService,
         AuthService,
-        {
-          provide: getRepositoryToken(UserRepository),
-          useValue: UserRepository,
-        },
+        UserRepository,
+        AuthGuard,
       ],
     }).compile();
 
@@ -103,7 +70,7 @@ describe('AuthController', () => {
   describe('[SignUp]', () => {
     it.each`
       email                   | password        | message
-      ------------------------                                         | ----------------- | ------------------------------------------------------
+      -----------------------                                          | ---------------- | ------------------------------------------------------
       ${''}                   | ${'Password1#'} | ${'email should not be empty'}
       ${'invalidEmail'}       | ${'Password1#'} | ${'email must be an email'}
       ${'test'}               | ${'Password1#'} | ${'email must be an email'}
@@ -243,8 +210,8 @@ describe('AuthController', () => {
 
   describe('SignOut', () => {
     it('should throw error if no token sent', async () => {
-      const response = await makeSignOutRequest(app, '');
-      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+      const response = await makeSignOutRequest(app, []);
+      expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
     it('should throw error if invalid/tempered token sent', async () => {
@@ -256,18 +223,43 @@ describe('AuthController', () => {
         ...credentials,
         name: 'John Doe',
       });
+
       const cookies = signUpResponse.headers[
         'set-cookie'
       ] as unknown as string[];
-      const accessToken = cookies[0];
 
-      const _accessToken =
-        accessToken.slice(
-          0,
-          accessToken.length === 0 ? 0 : accessToken.length - 1,
-        ) + 'Z';
-      const signOutResponse = await makeSignOutRequest(app, _accessToken);
+      const changedAccessTokenCookie = changeLastCharOfCookie(cookies[1]);
+
+      const signOutResponse = await makeSignOutRequest(app, [
+        cookies[0],
+        changedAccessTokenCookie,
+      ]);
       expect(signOutResponse.status).toBe(HttpStatus.UNAUTHORIZED);
     });
+
+    it('should signout if access token cookie is valid', async () => {
+      const credentials = {
+        email: 'myaccount@mail.com',
+        password: 'Abcd1234#',
+      };
+      const signUpResponse = await makeSignUpRequest(app, {
+        ...credentials,
+        name: 'John Doe',
+      });
+
+      const cookies = signUpResponse.headers[
+        'set-cookie'
+      ] as unknown as string[];
+
+      const signOutResponse = await makeSignOutRequest(app, cookies);
+      expect(signOutResponse.status).toBe(HttpStatus.OK);
+    });
   });
+
+  // NOTE:
+  /**
+   * Same as that we can further extend this to check refreshToken, and protected route usecases
+   * For now we are using unit tests, we can also do stateful and state-less fuzz tests
+   * SKIPPING MORE TESTS FOR NOW.
+   */
 });
