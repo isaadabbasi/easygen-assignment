@@ -22,7 +22,7 @@ I am available through the email to reason anything particular if you find confu
 
 ### How to run the project:
 
-Once the repository is fetch, navigate to the project folder 
+Once the repository is fetch, navigate to the project folder
 
 ```sh
 git clone https://github.com/isaadabbasi/easygen-assignment
@@ -32,6 +32,8 @@ cd easygen-assignment
 ```
 
 ### Steps: 
+
+Make sure you have **Docker 🚢** installed and running on your system. 
 
 #### 1: Setup env files
 Goto Frontend folder
