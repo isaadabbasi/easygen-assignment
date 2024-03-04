@@ -29,7 +29,7 @@ export function SignUpPage() {
   };
 
   return (
-    <div id="sign-up-page">
+    <div id="sign-up-page" className='flex justify-center'>
       <SignUpForm handleSubmit={handleSubmit} errors={formErrors} />
     </div>
   );

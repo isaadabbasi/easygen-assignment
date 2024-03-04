@@ -29,7 +29,7 @@ export function SignInPage() {
   }
 
   return (
-    <div id="sign-in-page">
+    <div id="sign-in-page" className='flex justify-center'>
       <SignInForm handleSubmit={handleSubmit} errors={formErrors} />
     </div>
   );

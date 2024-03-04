@@ -7,7 +7,6 @@ import { IAuth } from "src/defs";
 
 import "./home.page.css";
 
-
 const { AppRoutes } = constants;
 
 export function HomePage() {
@@ -22,7 +21,7 @@ export function HomePage() {
   });
 
   useEffect(() => {
-    authService.fetchProtectedData().then((user) => setUser(user))
+    authService.fetchProtectedData().then((user) => setUser(user));
   }, []);
 
   const onClick = async () => {
@@ -33,12 +32,10 @@ export function HomePage() {
 
   return (
     <div id="home-page">
-      <div className="container">
+      <div className="my-0 mx-auto text-center">
         <div className="hero">
-          
           <h2>Hello! {user.name}</h2>
           <h2>🏆 Welcome to the application. 🏆</h2>
-
         </div>
         {/* Security bad bractice | for **Demo App Only** */}
         {/* Using Images from third party URLs is not recommended */}
@@ -49,7 +46,12 @@ export function HomePage() {
         />
         <br />
         <br />
-        <button className="error" onClick={onClick}>Sign Out</button>
+        <button
+          className="w-full rounded bg-red-600 text-white uppercase font-bold border-none h-10 hover:bg-red-700"
+          onClick={onClick}
+        >
+          Sign Out
+        </button>
       </div>
     </div>
   );

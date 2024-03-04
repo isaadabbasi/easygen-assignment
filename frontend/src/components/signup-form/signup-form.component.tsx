@@ -39,8 +39,9 @@ export function SignUpForm(props: ISignUpFormProps) {
   };
 
   return (
-    <form id="sign-up-form">
-      <h2 className="title">Sign Up</h2>
+    <form id="sign-up-form" className="bg-white border p-4 rounded cx-box-shadow">
+      <h2 className="font-bold uppercase">Sign Up</h2>
+      <br />
       <div className="form-group">
         <label htmlFor="email">Full Name:</label>
         <input
@@ -72,12 +73,12 @@ export function SignUpForm(props: ISignUpFormProps) {
         />
       </div>
       <FormErrors messages={errors} />
-      <button className="primary" type="submit" onClick={_handleSubmit}>
+      <button className="w-full rounded bg-blue-600 text-white uppercase font-bold border-none h-10 hover:bg-blue-700" type="submit" onClick={_handleSubmit}>
         Sign Up
       </button>
-      <p className="rdr">
-        Already have an account?{" "}
-        <a href="#" onClick={navigateToSignIn}>
+      <p className="m-2 text-center text-sm text-gray-500">
+        Already have an account?&nbsp;
+        <a className="text-gray-500 font-bold uppercase" href="#" onClick={navigateToSignIn}>
           Sign In
         </a>
       </p>

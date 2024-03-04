@@ -2,18 +2,15 @@
 #sign-up-page,
 #sign-in-page {
   margin-top: 100px;
-  display: flex;
-  justify-content: center;
 }
 
 #sign-up-form,
 #sign-in-form {
-  background: white;
-  border-radius: var(--border-radius-basic);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--box-shadow);
-  padding: 16px;
   width: 380px;
+}
+
+.cx-box-shadow {
+  box-shadow: var(--box-shadow);
 }
 
 #sign-up-form .title,
@@ -26,11 +23,11 @@
   margin-bottom: 16px;
 }
 
-#sign-up-form label,
+/* #sign-up-form label,
 #sign-in-form label {
   display: block;
   margin-bottom: 3px;
-}
+} */
 
 #sign-up-form input[type='email'], input[type='password'], input[type='text'],
 #sign-in-form input[type='email'], input[type='password'] {
@@ -41,7 +38,7 @@
   width: 100%;
 }
 
-button,
+/* button,
 button {
   border-radius: var(--border-radius-basic);
   border: none;
@@ -51,7 +48,7 @@ button {
   padding: 10px;
   text-transform: uppercase;
   width: 100%;
-}
+} */
 
 button.primary {
   color: white;
@@ -69,19 +66,4 @@ button.error {
 
 button.error:hover {
   background-color: var(--error-dark-color);
-}
-
-#sign-up-form .rdr,
-#sign-in-form .rdr {
-  color: grey;
-  font-size: 12px;
-  margin-top: 16px;
-  text-align: center;
-}
-
-#sign-up-form .rdr a,
-#sign-in-form .rdr a {
-  font-weight: bold;
-  text-decoration: none;
-  color: var(--primary-dark-color);
 }
